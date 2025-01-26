@@ -6,15 +6,15 @@ defmodule Mix.Tasks.Package.Ios.Runtime do
   def architectures() do
     # Not sure if we still need arm-32 at all https://blakespot.com/ios_device_specifications_grid.html
     %{
-      "ios" => %{
-        arch: "armv7",
-        id: "ios",
-        sdk: "iphoneos",
-        openssl_arch: "ios-xcrun",
-        xcomp: "arm-ios",
-        name: "arm-apple-ios",
-        cflags: "-mios-version-min=7.0.0 -fno-common -Os -D__IOS__=yes"
-      },
+      # "ios" => %{
+      #   arch: "armv7",
+      #   id: "ios",
+      #   sdk: "iphoneos",
+      #   openssl_arch: "ios-xcrun",
+      #   xcomp: "arm-ios",
+      #   name: "arm-apple-ios",
+      #   cflags: "-mios-version-min=7.0.0 -fno-common -Os -D__IOS__=yes"
+      # },
       "ios-arm64" => %{
         arch: "arm64",
         id: "ios64",
@@ -59,7 +59,7 @@ defmodule Mix.Tasks.Package.Ios.Runtime do
   end
 
   def run([]) do
-    run(["https://github.com/elixir-desktop/exqlite"])
+    run(["https://github.com/elixir-sqlite/exqlite"])
   end
 
   def run(nifs) do
