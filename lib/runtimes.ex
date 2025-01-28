@@ -39,8 +39,7 @@ defmodule Runtimes do
 
   def default_nifs() do
     [
-      "https://github.com/diodechain/esqlite.git",
-      "https://github.com/elixir-desktop/exqlite",
+      "https://github.com/mmzeeman/esqlite",
       "https://github.com/diodechain/libsecp256k1.git"
     ]
   end
