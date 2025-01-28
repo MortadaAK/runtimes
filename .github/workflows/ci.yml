@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 
 env:
+  OTP_MAIN: 27
   OTP_VERSION: 27.2
   ELIXIR_VERSION: 1.17.3
 
@@ -57,24 +58,18 @@ jobs:
 
       - name: Setup Erlang and Elixir with asdf
         run: |
-          git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
-          echo ". $HOME/.asdf/asdf.sh" >> $HOME/.bash_profile
+          git clone https://github.com/asdf-vm/asdf.git ~/.asdf
           . $HOME/.asdf/asdf.sh
-          asdf plugin-add erlang || true
-          asdf plugin-add elixir || true
-          asdf install erlang ${{ env.OTP_VERSION }}
-          asdf install elixir ${{ env.ELIXIR_VERSION }}
-          asdf global erlang ${{ env.OTP_VERSION }}
-          asdf global elixir ${{ env.ELIXIR_VERSION }}
+          asdf plugin add erlang
+          asdf plugin add elixir
+          echo "erlang ${{ env.OTP_VERSION }}" >> .tool-versions
+          echo "elixir ${{ env.ELIXIR_VERSION }}-otp-${{ env.OTP_MAIN }}" >> .tool-versions
+          asdf install
 
-      - name: Install Dependencies
+      - name: Install Dependencies and build iOS Runtime
         run: |
           . $HOME/.asdf/asdf.sh
           mix deps.get
-
-      - name: Build iOS Runtime
-        run: |
-          . $HOME/.asdf/asdf.sh
           mix package.ios.runtime
 
       - name: Archive iOS Runtime
