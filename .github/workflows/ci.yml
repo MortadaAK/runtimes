@@ -66,13 +66,16 @@ jobs:
           asdf install elixir ${{ env.ELIXIR_VERSION }}
           asdf global erlang ${{ env.OTP_VERSION }}
           asdf global elixir ${{ env.ELIXIR_VERSION }}
-          export PATH="$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH"
 
       - name: Install Dependencies
-        run: mix deps.get
+        run: |
+          . $HOME/.asdf/asdf.sh
+          mix deps.get
 
       - name: Build iOS Runtime
-        run: mix package.ios.runtime
+        run: |
+          . $HOME/.asdf/asdf.sh
+          mix package.ios.runtime
 
       - name: Archive iOS Runtime
         uses: actions/upload-artifact@v3
