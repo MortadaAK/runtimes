@@ -108,7 +108,7 @@ defmodule Mix.Tasks.Package.Android.Runtime do
 
   def default_archs() do
     case System.get_env("ARCH", nil) do
-      nil -> ["arm", "arm64", "x86_64"]
+      nil -> ["arm64", "x86_64"]
       arch -> [arch]
     end
   end

@@ -38,13 +38,13 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: android-${{ matrix.arch }}-runtime
-          path: _build/${{ matrix.arch }}/*.zip
+          path: _build/*.zip
 
       - name: Publish Android Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: _build/${{ matrix.arch }}/*.zip
+          files: _build/*.zip
 
   build_ios:
     name: "Build iOS Runtime"
@@ -66,20 +66,24 @@ jobs:
           echo "elixir ${{ env.ELIXIR_VERSION }}-otp-${{ env.OTP_MAIN }}" >> .tool-versions
           asdf install
 
-      - name: Install Dependencies and build iOS Runtime
+      - name: Install Dependencies and Build iOS Runtime
         run: |
           . $HOME/.asdf/asdf.sh
           mix deps.get
           mix package.ios.runtime
 
-      - name: Archive iOS Runtime
+      - name: Zip iOS Runtime
+        run: |
+          zip -r _build/liberlang.xcframework.zip _build/liberlang.xcframework
+
+      - name: Upload iOS Runtime Artifact
         uses: actions/upload-artifact@v3
         with:
           name: ios-runtime
-          path: _build/liberlang.xcframework
+          path: _build/liberlang.xcframework.zip
 
       - name: Publish iOS Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: _build/liberlang.xcframework
+          files: _build/liberlang.xcframework.zip
