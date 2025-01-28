@@ -52,14 +52,14 @@ defmodule Mix.Tasks.Package.Android.Runtime do
 
   def architectures() do
     %{
-      "arm" => %{
-        id: "arm",
-        abi: 23,
-        cpu: "arm",
-        pc: "arm-unknown",
-        android_name: "androideabi",
-        android_type: "armeabi-v7a"
-      },
+      # "arm" => %{
+      #   id: "arm",
+      #   abi: 23,
+      #   cpu: "arm",
+      #   pc: "arm-unknown",
+      #   android_name: "androideabi",
+      #   android_type: "armeabi-v7a"
+      # },
       "arm64" => %{
         id: "arm64",
         abi: 23,

@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [arm, arm64, x86_64]
+        arch: [arm64, x86_64]
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -55,11 +55,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup Elixir
-        uses: erlef/setup-beam@v1
-        with:
-          otp-version: ${{ env.OTP_VERSION }}
-          elixir-version: ${{ env.ELIXIR_VERSION }}
+      - name: Setup Erlang and Elixir with asdf
+        run: |
+          git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.0
+          echo ". $HOME/.asdf/asdf.sh" >> $HOME/.bash_profile
+          . $HOME/.asdf/asdf.sh
+          asdf plugin-add erlang || true
+          asdf plugin-add elixir || true
+          asdf install erlang ${{ env.OTP_VERSION }}
+          asdf install elixir ${{ env.ELIXIR_VERSION }}
+          asdf global erlang ${{ env.OTP_VERSION }}
+          asdf global elixir ${{ env.ELIXIR_VERSION }}
 
       - name: Install Dependencies
         run: mix deps.get
