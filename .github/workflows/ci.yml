@@ -66,6 +66,7 @@ jobs:
           asdf install elixir ${{ env.ELIXIR_VERSION }}
           asdf global erlang ${{ env.OTP_VERSION }}
           asdf global elixir ${{ env.ELIXIR_VERSION }}
+          export PATH="$HOME/.asdf/shims:$HOME/.asdf/bin:$PATH"
 
       - name: Install Dependencies
         run: mix deps.get
