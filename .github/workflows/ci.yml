@@ -1,74 +1,79 @@
 name: "CI"
-on: ["push", "pull_request", "workflow_dispatch"]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
 env:
-  OTP_TAG: OTP-27.2
-  OTP_SOURCE: https://github.com/erlang/otp
+  OTP_VERSION: 27.2
+  ELIXIR_VERSION: 1.17.3
 
 jobs:
-  build:
-    name: "Build Android runtimes"
-    runs-on: "ubuntu-latest"
+  build_android:
+    name: "Build Android Runtimes"
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: ["arm", "arm64", "x86_64"]
+        arch: [arm, arm64, x86_64]
     steps:
-      - name: Setup elixir
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Elixir
         uses: erlef/setup-beam@v1
         with:
-          otp-version: 27.2
-          elixir-version: 1.17.3
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
 
-      - uses: actions/checkout@v2
+      - name: Install Dependencies
+        run: mix deps.get
 
-      - run: |
-          scripts/install_elixir.sh "$HOME/elixir"
-          echo "$HOME/elixir/bin" >> $GITHUB_PATH
-
-      - name: Build Android ${{ matrix.arch }} runtimes
+      - name: Build Android ${{ matrix.arch }} Runtimes
         run: |
-          mix deps.get
           ARCH=${{ matrix.arch }} mix package.android.runtime
           ARCH=${{ matrix.arch }} mix package.android.nif
-      - name: Archive Android runtimes
-        uses: actions/upload-artifact@v2
+
+      - name: Archive Android Runtimes
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.arch }}-runtime
-          path: _build/*.zip
-      - name: Android ${{ matrix.arch }} release
+          name: android-${{ matrix.arch }}-runtime
+          path: _build/${{ matrix.arch }}/*.zip
+
+      - name: Publish Android Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: _build/*.zip
+          files: _build/${{ matrix.arch }}/*.zip
 
-  ios:
-    name: "Build iOS runtime"
-    runs-on: "macos-latest"
+  build_ios:
+    name: "Build iOS Runtime"
+    runs-on: macos-latest
     steps:
-      - run: brew install git carthage coreutils
-      - uses: actions/checkout@v2
+      - name: Install Prerequisites
+        run: brew install git carthage coreutils
 
-      - name: Setup elixir
-        run: |
-          git clone https://github.com/asdf-vm/asdf.git ~/.asdf
-          . $HOME/.asdf/asdf.sh
-          asdf plugin add erlang
-          asdf plugin add elixir
-          echo "erlang 27.2" >> .tool-versions
-          echo "elixir 1.17.3-otp-27" >> .tool-versions
-          asdf install
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Build runtime
-        run: |
-          . $HOME/.asdf/asdf.sh
-          mix package.ios.runtime
-
-      - name: Archive runtimes
-        uses: actions/upload-artifact@v2
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
         with:
-          name: iOS-runtime
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Build iOS Runtime
+        run: mix package.ios.runtime
+
+      - name: Archive iOS Runtime
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-runtime
           path: _build/liberlang.xcframework
 
-      - name: iOS release
+      - name: Publish iOS Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
